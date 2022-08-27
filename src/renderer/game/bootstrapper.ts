@@ -1,28 +1,16 @@
 import {
   Bootstrapper as BaseBootstrapper,
-  Camera,
-  CssSpriteRenderer,
+  Physics2DLoader,
   SceneBuilder,
 } from 'the-world-engine';
-import { Vector3 } from 'three';
-import Rotator from './scripts/rotater';
+import GameScene from './prefab/gamescene';
 
-export default class Bootstrapper extends BaseBootstrapper {
-  public override run(): SceneBuilder {
-    return this.sceneBuilder
-      .withChild(
-        this.instantiater
-          .buildGameObject('camera', new Vector3(0, 0, 10))
-          .withComponent(Camera, (c) => {
-            c.viewSize = 5;
-          })
-      )
+export class Bootstrapper extends BaseBootstrapper {
+  public run(): SceneBuilder {
+    this.setting.physics.loader(Physics2DLoader);
 
-      .withChild(
-        this.instantiater
-          .buildGameObject('test_object')
-          .withComponent(CssSpriteRenderer)
-          .withComponent(Rotator)
-      );
+    return this.sceneBuilder.withChild(
+      this.instantiater.buildPrefab('gamescene', GameScene).make()
+    );
   }
 }
