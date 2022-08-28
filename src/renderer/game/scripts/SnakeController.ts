@@ -7,7 +7,7 @@ import {
   Transform,
   WaitForSeconds,
 } from 'the-world-engine';
-import { Vector2 } from 'three';
+import { Vector2 } from 'three/src/Three';
 import GameScene from '../prefab/gamescene';
 import { SnakeSegment } from '../prefab/SnakeSegment';
 
@@ -21,32 +21,31 @@ export default class SnakeController extends Component {
   private _spawnSegmentCountAtStart: number = 4;
   private _segments: Transform[] = [];
 
-  private onTriggerEnter2D(collision: Collider2D) {
+  public onTriggerEnter2D(collision: Collider2D) {
     if (collision.gameObject.name === 'item') {
       this.spawnSegment();
-    }
-    if (collision.gameObject.name === 'segment') {
-      console.log('You lose');
+    } else if (collision.gameObject.name === 'segment') {
+      this.engine.scene.children[0].gameObject.destroy();
       this.engine.scene.addChildFromBuilder(
         this.engine.instantiater.buildPrefab('gamescene', GameScene).make()
       );
-      this.engine.scene.children[0].gameObject.destroy();
     }
   }
 
   public awake() {
     this._segments.push(this.transform);
 
-    for (let i = 0; i < this._spawnSegmentCountAtStart; i += 1) {
+    this.spawnSegment('neck');
+    for (let i = 1; i < this._spawnSegmentCountAtStart; i += 1) {
       this.spawnSegment();
     }
 
     this.startCoroutine(this.move());
   }
 
-  private spawnSegment() {
+  private spawnSegment(name = 'segment') {
     const segment: GameObject = this.engine.scene.addChildFromBuilder(
-      this.engine.instantiater.buildPrefab('segment', SnakeSegment).make()
+      this.engine.instantiater.buildPrefab(name, SnakeSegment).make()
     );
     const prev = this._segments[this._segments.length - 1].position;
     segment.transform.position.set(prev.x, prev.y, 0);

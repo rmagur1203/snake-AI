@@ -15,7 +15,7 @@ import {
   RigidbodyType2D,
   TileAtlasItem,
 } from 'the-world-engine';
-import { Vector2, Vector3 } from 'three';
+import { Vector2, Vector3 } from 'three/src/Three';
 import grid from '../../../../assets/grid.png';
 import { ItemPrefab } from './Item';
 import SnakeController from '../scripts/SnakeController';
@@ -100,6 +100,8 @@ export default class GameScene extends Prefab {
           })
           .withComponent(BoxCollider2D, (c) => {
             c.isTrigger = true;
+            c.size = new Vector2(0.5, 0.5);
+            c.debugDraw = false;
           })
       )
 

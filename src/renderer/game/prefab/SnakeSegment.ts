@@ -4,6 +4,7 @@ import {
   GameObjectBuilder,
   Prefab,
 } from 'the-world-engine';
+import { Vector2 } from 'three/src/Three';
 
 export class SnakeSegment extends Prefab {
   public make(): GameObjectBuilder {
@@ -17,6 +18,9 @@ export class SnakeSegment extends Prefab {
         c.elementHeight = 0.7;
         c.autoSize = false;
       })
-      .withComponent(BoxCollider2D);
+      .withComponent(BoxCollider2D, (c) => {
+        c.size = new Vector2(0.5, 0.5);
+        c.debugDraw = false;
+      });
   }
 }

@@ -5,7 +5,7 @@ import {
   Prefab,
   PrefabRef,
 } from 'the-world-engine';
-import { Vector2 } from 'three';
+import { Vector2 } from 'three/src/Three';
 import { ItemScript } from '../scripts/Item';
 
 export class ItemPrefab extends Prefab {
