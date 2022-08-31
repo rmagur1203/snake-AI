@@ -33,7 +33,7 @@ export default class SnakeController extends Component {
 
   private gameover(): void {
     this.engine.scene.iterateChild((transform) => {
-      if (transform.gameObject.name.startsWith('gamescene')) {
+      if (transform.gameObject.name === 'gamescene') {
         transform.gameObject.destroy();
         return false;
       }
@@ -41,9 +41,7 @@ export default class SnakeController extends Component {
     });
 
     this.engine.scene.addChildFromBuilder(
-      this.engine.instantiater
-        .buildPrefab(`gamescene${new Date().getTime()}`, GameScene)
-        .make()
+      this.engine.instantiater.buildPrefab('gamescene', GameScene).make()
     );
   }
 

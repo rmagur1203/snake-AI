@@ -7,6 +7,10 @@ export class AIController extends Component {
   private item?: GameObject;
   private gameScene?: Transform;
 
+  get score() {
+    return this.snakeSegments.length;
+  }
+
   public updateObjects() {
     this.snakeHead = undefined;
     this.snakeNeck = undefined;
@@ -14,10 +18,9 @@ export class AIController extends Component {
     this.item = undefined;
     this.gameScene = undefined;
     this.engine.scene.iterateChild((scene) => {
-      console.log('find: ', scene.gameObject.name);
-      if (scene.gameObject.name.startsWith('gamescene')) {
+      if (scene.gameObject.name === 'gamescene') {
+        this.gameScene = scene;
         scene.iterateChild((transform) => {
-          console.log(transform.gameObject.name);
           switch (transform.gameObject.name) {
             case 'snake':
               this.snakeHead = transform.gameObject;
@@ -46,6 +49,11 @@ export class AIController extends Component {
   // }
 
   public update() {
-    console.log(this.snakeHead?.transform.parent?.gameObject.name);
+    this.snakeSegments =
+      this.gameScene?.children
+        .filter((transform) => transform.gameObject.name === 'segment')
+        .map((transform) => transform.gameObject) || [];
+
+    console.log(this.score);
   }
 }
