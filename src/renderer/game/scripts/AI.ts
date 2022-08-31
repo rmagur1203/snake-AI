@@ -36,7 +36,6 @@ export class AIController extends Component {
           }
           return true;
         });
-        return false;
       }
       return true;
     });
