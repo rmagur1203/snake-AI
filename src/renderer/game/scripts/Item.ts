@@ -3,7 +3,7 @@ import { BoxCollider2D, Collider2D, Component } from 'the-world-engine';
 export class ItemScript extends Component {
   public mapCollider2D?: BoxCollider2D;
 
-  public onTriggerEnter2D(collider: Collider2D) {
+  public onTriggerEnter2D() {
     this.SetupRandomPosition();
   }
 

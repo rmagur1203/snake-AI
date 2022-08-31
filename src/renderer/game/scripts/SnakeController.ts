@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import {
+  BoxCollider2D,
   Collider2D,
   Component,
   CoroutineIterator,
@@ -10,9 +11,10 @@ import {
 import { Vector2 } from 'three/src/Three';
 import GameScene from '../prefab/gamescene';
 import { SnakeSegment } from '../prefab/SnakeSegment';
+import { AIController } from './AI';
 
 export default class SnakeController extends Component {
-  public mapCollider2D?: Collider2D;
+  public mapCollider2D?: BoxCollider2D;
 
   private _moveTime = 0.1;
   private _moveDirection = new Vector2(1, 0);
@@ -25,11 +27,24 @@ export default class SnakeController extends Component {
     if (collision.gameObject.name === 'item') {
       this.spawnSegment();
     } else if (collision.gameObject.name === 'segment') {
-      this.engine.scene.children[0].gameObject.destroy();
-      this.engine.scene.addChildFromBuilder(
-        this.engine.instantiater.buildPrefab('gamescene', GameScene).make()
-      );
+      this.gameover();
     }
+  }
+
+  private gameover(): void {
+    this.engine.scene.iterateChild((transform) => {
+      if (transform.gameObject.name.startsWith('gamescene')) {
+        transform.gameObject.destroy();
+        return false;
+      }
+      return true;
+    });
+
+    this.engine.scene.addChildFromBuilder(
+      this.engine.instantiater
+        .buildPrefab(`gamescene${new Date().getTime()}`, GameScene)
+        .make()
+    );
   }
 
   public awake() {
@@ -40,13 +55,23 @@ export default class SnakeController extends Component {
       this.spawnSegment();
     }
 
+    this.engine.scene.iterateChild((transform) => {
+      console.log('start: ', this.gameObject.transform.parent?.gameObject.name);
+      if (transform.gameObject.name === 'AI') {
+        transform.gameObject.getComponent(AIController)?.updateObjects();
+        return false;
+      }
+      return true;
+    });
+
     this.startCoroutine(this.move());
   }
 
   private spawnSegment(name = 'segment') {
-    const segment: GameObject = this.engine.scene.addChildFromBuilder(
-      this.engine.instantiater.buildPrefab(name, SnakeSegment).make()
-    );
+    const segment: GameObject =
+      this.transform.parent!.gameObject.addChildFromBuilder(
+        this.engine.instantiater.buildPrefab(name, SnakeSegment).make()
+      );
     const prev = this._segments[this._segments.length - 1].position;
     segment.transform.position.set(prev.x, prev.y, 0);
     this._segments.push(segment.transform);
@@ -63,6 +88,17 @@ export default class SnakeController extends Component {
     const x = this.transform.position.x + this._moveDirection.x;
     const y = this.transform.position.y + this._moveDirection.y;
     this._segments[0].position.set(x, y, 0);
+
+    const bounds = this.mapCollider2D!.size;
+
+    if (
+      this.transform.position.x < -(bounds.x / 2) ||
+      this.transform.position.x > bounds.x / 2 ||
+      this.transform.position.y < -(bounds.y / 2) ||
+      this.transform.position.y > bounds.y / 2
+    ) {
+      this.gameover();
+    }
   }
 
   public *move(): CoroutineIterator {
